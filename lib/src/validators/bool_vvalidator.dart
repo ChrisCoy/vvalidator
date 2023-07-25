@@ -30,20 +30,17 @@ class BoolVValidator {
     return this;
   }
 
-  BoolVValidator refine(bool Function(bool) refineFunction) {
-    _rules.add(() {
-      _value = refineFunction(_value);
-      return null;
-    });
+  BoolVValidator refine(String? Function(bool) refineFunction) {
+    _rules.add(() => refineFunction(_value));
 
     return this;
   }
 
-  String? Function(bool?) require({String? message}) {
+  String? Function(dynamic) require({String? message}) {
     return (val) {
       if (val == null) return message ?? "Value must be a boolean";
       _value = val;
-      for (var i = _rules.length - 1; i > 0; i--) {
+      for (var i = _rules.length - 1; i >= 0; i--) {
         var error = _rules[i]();
         if (error != null) return error;
       }
@@ -51,12 +48,12 @@ class BoolVValidator {
     };
   }
 
-  String? Function(bool?) optional(
+  String? Function(dynamic) optional(
       {String? message, String Function(String?)? transform}) {
     return (val) {
       if (val == null) return null;
       _value = val;
-      for (var i = _rules.length - 1; i > 0; i--) {
+      for (var i = _rules.length - 1; i >= 0; i--) {
         var error = _rules[i]();
         if (error != null) return error;
       }

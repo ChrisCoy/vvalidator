@@ -100,11 +100,30 @@ class StringVValidator {
     return this;
   }
 
-  StringVValidator refine(String Function(String) refineFunction) {
+  StringVValidator onlyNumbers({String? message}) {
     _rules.add(() {
-      _value = refineFunction(_value);
+      if (!RegExp(r"^[0-9]+$").hasMatch(_value)) {
+        return message ?? "Can only contain numbers";
+      }
       return null;
     });
+
+    return this;
+  }
+
+  StringVValidator onlyLettersAndNumbers({String? message}) {
+    _rules.add(() {
+      if (!RegExp(r"^[a-zA-Z0-9]+$").hasMatch(_value)) {
+        return message ?? "Can only contain letters and numbers";
+      }
+      return null;
+    });
+
+    return this;
+  }
+
+  StringVValidator refine(String? Function(String) refineFunction) {
+    _rules.add(() => refineFunction(_value));
 
     return this;
   }
@@ -120,25 +139,23 @@ class StringVValidator {
     return this;
   }
 
-  String? Function(String?) require(
-      {String? message, String Function(String?)? transform}) {
-    _rules.add(() {
-      if (_value.isEmpty) {
-        return message ?? "Cannot be empty";
-      }
-      return null;
-    });
-
+  String? Function(dynamic) require(
+      {String? message, String Function(dynamic)? transform}) {
     return (val) {
-      if (val is! String) return _invalidTypeMessage;
-
       if (transform != null) {
-        _value = transform(val);
+        try {
+          _value = transform(val);
+        } catch (e) {
+          return _invalidTypeMessage;
+        }
       } else {
+        if (val == null) return _invalidTypeMessage;
+        if (val is! String) return _invalidTypeMessage;
+        if (val.isEmpty) return message ?? "Cannot be empty";
         _value = val;
       }
 
-      for (var i = _rules.length - 1; i > 0; i--) {
+      for (var i = _rules.length - 1; i >= 0; i--) {
         var error = _rules[i]();
         if (error != null) return error;
       }
@@ -147,20 +164,23 @@ class StringVValidator {
     };
   }
 
-  String? Function(String?) optional(
-      {String? message, String Function(String?)? transform}) {
+  String? Function(dynamic) optional(
+      {String? message, String Function(dynamic)? transform}) {
     return (val) {
-      if (val is String && val.isEmpty) return null;
-
-      if (val is! String) return _invalidTypeMessage;
-
       if (transform != null) {
-        _value = transform(val);
+        try {
+          _value = transform(val);
+        } catch (e) {
+          return _invalidTypeMessage;
+        }
       } else {
+        if (val == null) return null;
+        if (val is! String) return _invalidTypeMessage;
+        if (val.isEmpty) return null;
         _value = val;
       }
 
-      for (var i = _rules.length - 1; i > 0; i--) {
+      for (var i = _rules.length - 1; i >= 0; i--) {
         var error = _rules[i]();
         if (error != null) return error;
       }

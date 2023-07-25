@@ -4,9 +4,17 @@ import 'src/validators/bool_vvalidator.dart';
 import 'src/validators/number_vvalidator.dart';
 import 'src/validators/string_vvalidator.dart';
 
-// ideas: put a transform function to transform the value before validate,
-// this function will be passed in the required or optional function
+export 'src/flutter/errors_vv.dart';
+export 'src/flutter/field_vv.dart';
+export 'src/flutter/schema_vv.dart';
+export 'src/validators/bool_vvalidator.dart';
+export 'src/validators/number_vvalidator.dart';
+export 'src/validators/string_vvalidator.dart';
 
+/* 
+  ideas: pass a flag to optional to make it required, this is useful 
+    for create a method that validate all fields even if they are optional
+ */
 class V {
   static StringVValidator string({String? invalidTypeMessage}) {
     return StringVValidator(invalidTypeMessage: invalidTypeMessage);
@@ -19,8 +27,4 @@ class V {
   static BoolVValidator bool({String? invalidTypeMessage}) {
     return BoolVValidator(invalidTypeMessage: invalidTypeMessage);
   }
-}
-
-class Qualquercoisa {
-  Qualquercoisa() {}
 }

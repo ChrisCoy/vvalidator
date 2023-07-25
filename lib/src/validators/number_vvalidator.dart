@@ -84,34 +84,34 @@ class NumberVValidator {
     return this;
   }
 
-  NumberVValidator refine(num Function(num) refineFunction) {
-    _rules.add(() {
-      _value = refineFunction(_value);
-      return null;
-    });
+  NumberVValidator refine(String? Function(num) refineFunction) {
+    _rules.add(() => refineFunction(_value));
 
     return this;
   }
 
-  String? Function(num?) require(
-      {String? message, num Function(num?)? transform}) {
+  String? Function(dynamic) require(
+      {String? message, num Function(dynamic)? transform}) {
     _rules.add(() {
-      if (_value.isNaN) {
-        return message ?? "Value must be a number";
-      }
       return null;
     });
 
     return (val) {
-      if (val is! num) return _invalidTypeMessage;
-
       if (transform != null) {
-        _value = transform(val);
+        try {
+          _value = transform(val);
+        } catch (e) {
+          return _invalidTypeMessage;
+        }
       } else {
+        if (val == null) return message ?? "Value must be a number";
+        if (val is! num) return _invalidTypeMessage;
+        if (val.isNaN) return message ?? "Value must be a number";
+
         _value = val;
       }
 
-      for (var i = _rules.length - 1; i > 0; i--) {
+      for (var i = _rules.length - 1; i >= 0; i--) {
         var error = _rules[i]();
         if (error != null) return error;
       }
@@ -120,20 +120,23 @@ class NumberVValidator {
     };
   }
 
-  String? Function(num?) optional(
-      {String? message, num Function(num?)? transform}) {
+  String? Function(dynamic) optional(
+      {String? message, num Function(dynamic)? transform}) {
     return (val) {
-      if (val is num && val.isNaN) return null;
-
-      if (val is! num) return _invalidTypeMessage;
-
       if (transform != null) {
-        _value = transform(val);
+        try {
+          _value = transform(val);
+        } catch (e) {
+          return _invalidTypeMessage;
+        }
       } else {
+        if (val == null) return null;
+        if (val is! num) return _invalidTypeMessage;
+        if (val.isNaN) return message ?? "Value must be a number";
         _value = val;
       }
 
-      for (var i = _rules.length - 1; i > 0; i--) {
+      for (var i = _rules.length - 1; i >= 0; i--) {
         var error = _rules[i]();
         if (error != null) return error;
       }
