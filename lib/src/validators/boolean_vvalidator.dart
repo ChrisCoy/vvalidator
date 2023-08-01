@@ -1,14 +1,14 @@
-class BoolVValidator {
+class BooleanVValidator {
   final _emailRegexp = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
   final List<String? Function()> _rules = [];
   late String _invalidTypeMessage;
   late bool _value;
 
-  BoolVValidator({String? invalidTypeMessage}) {
+  BooleanVValidator({String? invalidTypeMessage}) {
     _invalidTypeMessage = invalidTypeMessage ?? "Invalid type";
   }
 
-  BoolVValidator isTrue({String? message}) {
+  BooleanVValidator isTrue({String? message}) {
     _rules.add(() {
       if (!_value) {
         return message ?? "Value must be true";
@@ -19,7 +19,7 @@ class BoolVValidator {
     return this;
   }
 
-  BoolVValidator isFalse({String? message}) {
+  BooleanVValidator isFalse({String? message}) {
     _rules.add(() {
       if (_value) {
         return message ?? "Value must be false";
@@ -30,7 +30,7 @@ class BoolVValidator {
     return this;
   }
 
-  BoolVValidator refine(String? Function(bool) refineFunction) {
+  BooleanVValidator refine(String? Function(bool) refineFunction) {
     _rules.add(() => refineFunction(_value));
 
     return this;

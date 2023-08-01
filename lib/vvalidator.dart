@@ -1,6 +1,6 @@
 library vvalidator;
 
-import 'src/validators/bool_vvalidator.dart';
+import 'src/validators/boolean_vvalidator.dart';
 import 'src/validators/date_vvalidator.dart';
 import 'src/validators/number_vvalidator.dart';
 import 'src/validators/string_vvalidator.dart';
@@ -8,7 +8,7 @@ import 'src/validators/string_vvalidator.dart';
 export 'src/flutter/errors_vv.dart';
 export 'src/flutter/field_vv.dart';
 export 'src/flutter/schema_vv.dart';
-export 'src/validators/bool_vvalidator.dart';
+export 'src/validators/boolean_vvalidator.dart';
 export 'src/validators/number_vvalidator.dart';
 export 'src/validators/string_vvalidator.dart';
 
@@ -25,8 +25,8 @@ class V {
     return NumberVValidator(invalidTypeMessage: invalidTypeMessage);
   }
 
-  static BoolVValidator bool({String? invalidTypeMessage}) {
-    return BoolVValidator(invalidTypeMessage: invalidTypeMessage);
+  static BooleanVValidator boolean({String? invalidTypeMessage}) {
+    return BooleanVValidator(invalidTypeMessage: invalidTypeMessage);
   }
 
   static DateVValidator date({String? invalidTypeMessage}) {
