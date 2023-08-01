@@ -1,6 +1,7 @@
 library vvalidator;
 
 import 'src/validators/bool_vvalidator.dart';
+import 'src/validators/date_vvalidator.dart';
 import 'src/validators/number_vvalidator.dart';
 import 'src/validators/string_vvalidator.dart';
 
@@ -26,5 +27,9 @@ class V {
 
   static BoolVValidator bool({String? invalidTypeMessage}) {
     return BoolVValidator(invalidTypeMessage: invalidTypeMessage);
+  }
+
+  static DateVValidator date({String? invalidTypeMessage}) {
+    return DateVValidator(invalidTypeMessage: invalidTypeMessage);
   }
 }
