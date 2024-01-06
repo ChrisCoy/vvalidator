@@ -1,101 +1,150 @@
+import 'package:flutter/widgets.dart';
 import 'package:vvalidator/src/flutter/field_vv.dart';
 
 import 'errors_vv.dart';
 
-class SchemaVV {
-  late Map<String, FieldVV> fields;
-  late Map<String, String> errors = {};
-  late Map<String, String? Function(Map<String, FieldVV>)> _rules = {};
+abstract class SchemaVV {
+  // these two fields needs to be private to avoid direct access, therefore avoid losing formKey
+  Map<String, String> _errors = {};
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  FieldVV? get(key) => fields[key];
+  Map<String, String> get errors => _errors;
 
-  // TODO - implement copyWith
-  SchemaVV(this.fields);
+  GlobalKey<FormState> get formKey => _formKey;
 
-  void addField(String key, FieldVV field) {
-    fields[key] = field;
+  SchemaVV({required bool fillInitial}) {
+    print("lol");
+    if (!fillInitial) {
+      return;
+    }
+
+    // var emailField = fields["email"];
+    // print("lol hahaha " + (emailField?.initial ?? ""));
+
+    // print("lol2");
+
+    // bool wasEverythingAttached(){}
+
+    void fill() async {
+      // workaround to put the initial value in the field
+      await Future.delayed(const Duration(milliseconds: 0));
+      Map<String, FieldVV> fields = getFields();
+      var entries = fields.entries;
+
+      for (var entry in entries) {
+        if (entry.value.initial != null) {
+          print("lol4");
+          entry.value.controller.text = entry.value.initial!;
+        }
+      }
+    }
+
+    fill();
+
+    // fill() async {
+    //   await Future.delayed(const Duration(milliseconds: 1000));
+
+    //   print("lol3");
+
+    //   var entries = fields.entries;
+
+    //   if (emailField != null) {
+    //     emailField.controller.text = emailField.initial ?? '';
+    //   }
+
+    //   // for (var entry in entries) {
+    //   //   if (entry.value.initial != null) {
+    //   //     print("lol4");
+    //   //     entry.value.controller.text = entry.value.initial!;
+    //   //   }
+    //   // }
+    // }
+
+    // fill();
   }
 
-  // TODO - add type
-  refine(
-      {required String field,
-      required String? Function(Map<String, FieldVV>) rule}) {
-    _rules[field] = rule;
+  // this need to be protected because it only can be called in the child class
+  @protected
+  void refineField(FieldVV field, String? Function(String?) rule) {
+    var oldValidator = field.validator;
 
-    return this;
+    field.validator = (v) {
+      var error = rule(v);
+
+      if (error != null) {
+        return error;
+      }
+
+      return oldValidator(v);
+    };
   }
 
-  void removeField(String key) {
-    fields.remove(key);
-  }
+  Map<String, FieldVV> getFields();
 
-  bool _validate() {
-    errors = {};
-    for (String key in fields.keys) {
-      var field = fields[key]!;
+  bool validate() {
+    Map<String, FieldVV> fields = getFields();
+    var entries = fields.entries;
+
+    for (var entry in entries) {
+      var field = entry.value;
       var error = field.validator(field.controller.text);
       if (error != null) {
-        errors[key] = error;
+        errors[entry.key] = error;
       }
     }
 
-    for (String key in _rules.keys) {
-      var rule = _rules[key]!;
-      var error = rule(fields);
-      if (error != null) {
-        errors[key] = error;
-      }
+    if (errors.isEmpty) {
+      return true;
     }
-
-    if (errors.isEmpty) return true;
-
-    fields[errors.keys.elementAt(0)]?.focus();
 
     return false;
   }
 
-  void throwIfInvalid() {
-    errors = {};
-    for (String key in fields.keys) {
-      var field = fields[key]!;
-      var error = field.validator(field.controller.text);
-      if (error != null) {
-        throw ErrorVV(error, field: key, fieldController: field.controller);
-      }
+  bool flutterValidate() {
+    if (!formKey.currentState!.validate()) {
+      return false;
     }
 
-    for (String key in _rules.keys) {
-      var rule = _rules[key]!;
-      var error = rule(fields);
-      if (error != null) {
-        throw ErrorVV(error,
-            field: key, fieldController: fields[key]?.controller);
-      }
-    }
+    return true;
   }
 
-  void clear() {
-    errors = {};
-    for (String key in fields.keys) {
-      var field = fields[key]!;
-      field.controller.clear();
-    }
-  }
-
+  // TODO - correct reset to bool types or others
   void reset() {
-    errors = {};
-    for (String key in fields.keys) {
-      var field = fields[key]!;
-      field.controller.text = field.initialValue ?? '';
+    Map<String, FieldVV> fields = getFields();
+    var entries = fields.entries;
+
+    for (var entry in entries) {
+      var field = entry.value;
+      field.controller.text = field.initial ?? '';
     }
   }
 
-  void setValues(Map<String, dynamic> values) {
-    for (String key in fields.keys) {
-      var field = fields[key]!;
-      if (values.containsKey(key)) {
-        field.controller.text = values[key];
+  void setValues(Map<String, String> values) {
+    Map<String, FieldVV> fields = getFields();
+    var entries = fields.entries;
+
+    for (var entry in entries) {
+      var field = entry.value;
+      if (values.containsKey(entry.key) && values[entry.key] != null) {
+        field.controller.text = values[entry.key]!;
       }
     }
+  }
+
+  String getValue(String key) {
+    Map<String, FieldVV> fields = getFields();
+    var entries = fields.entries;
+
+    for (var entry in entries) {
+      if (entry.key == key) {
+        return entry.value.controller.text;
+      }
+    }
+
+    throw ErrorVV("Field $key not found");
+  }
+
+  void clearErrors() {
+    _errors = {};
   }
 }

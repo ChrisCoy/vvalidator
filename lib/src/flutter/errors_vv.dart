@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+// TODO - create betters errorsx, iex: ErrorVV, ErrorVValidator, ErrorSchemaVV
 class ErrorVV extends Error {
   String? reason;
   final String? field;

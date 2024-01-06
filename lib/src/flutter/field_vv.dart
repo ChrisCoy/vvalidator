@@ -2,9 +2,9 @@ import 'package:flutter/widgets.dart';
 
 class FieldVV {
   late TextEditingController _controller;
-  late FocusNode _focusNode;
+  final FocusNode _focusNode;
   String? Function(dynamic) validator;
-  String? initialValue;
+  String? initial;
 
   TextEditingController get controller => _controller;
   FocusNode get focusNode => _focusNode;
@@ -14,6 +14,7 @@ class FieldVV {
   FieldVV(
       {required this.validator,
       TextEditingController? controller,
+      this.initial,
       FocusNode? focusNode})
       : _controller = controller ?? TextEditingController(),
         _focusNode = focusNode ?? FocusNode();
