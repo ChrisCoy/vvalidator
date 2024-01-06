@@ -9,12 +9,14 @@ class SchemaVV {
 
   FieldVV? get(key) => fields[key];
 
+  // TODO - implement copyWith
   SchemaVV(this.fields);
 
   void addField(String key, FieldVV field) {
     fields[key] = field;
   }
 
+  // TODO - add type
   refine(
       {required String field,
       required String? Function(Map<String, FieldVV>) rule}) {
@@ -27,7 +29,7 @@ class SchemaVV {
     fields.remove(key);
   }
 
-  bool validate() {
+  bool _validate() {
     errors = {};
     for (String key in fields.keys) {
       var field = fields[key]!;

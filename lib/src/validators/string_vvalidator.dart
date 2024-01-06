@@ -1,3 +1,6 @@
+// TODO - move all generic method to a separate class wich will be extended by all other validators
+import 'package:vvalidator/vvalidator.dart';
+
 class StringVValidator {
   final _emailRegexp = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
   final List<String? Function()> _rules = [];
@@ -78,17 +81,6 @@ class StringVValidator {
     return this;
   }
 
-  StringVValidator numberString({String? message}) {
-    _rules.add(() {
-      if (!RegExp(r"^[0-9]+$").hasMatch(_value)) {
-        return message ?? "Campo inválido";
-      }
-      return null;
-    });
-
-    return this;
-  }
-
   StringVValidator onlyLetters({String? message}) {
     _rules.add(() {
       if (!RegExp(r"^[a-zA-Z]+$").hasMatch(_value)) {
@@ -124,6 +116,31 @@ class StringVValidator {
 
   StringVValidator refine(String? Function(String) refineFunction) {
     _rules.add(() => refineFunction(_value));
+
+    return this;
+  }
+
+  StringVValidator mustBeEqualTo(
+      {FieldVV? field, String? value, String? message}) {
+    if (field != null && value != null) {
+      throw Exception("You can only pass field or value, not both");
+    }
+
+    if (field != null) {
+      _rules.add(() {
+        if (_value != field.value) {
+          return "Doesn't match to ${field.value}";
+        }
+        return null;
+      });
+    } else if (value != null) {
+      _rules.add(() {
+        if (_value != value) {
+          return "Doesn't match to $value";
+        }
+        return null;
+      });
+    }
 
     return this;
   }

@@ -1,5 +1,4 @@
 class BooleanVValidator {
-  final _emailRegexp = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
   final List<String? Function()> _rules = [];
   late String _invalidTypeMessage;
   late bool _value;
